@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import { assets } from "../assets/assets";
 import { useAppContext } from "../context/AppContext";
@@ -7,6 +7,7 @@ import toast from "react-hot-toast";
 const Navbar = () => {
   const [open, setOpen] = useState(false);
   const [openProfileMenu, setOpenProfileMenu] = useState(false);
+  const menuRef = useRef(null);
 
   const location = useLocation();
 
@@ -65,6 +66,19 @@ const Navbar = () => {
     };
   }, []);
 
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (menuRef.current && !menuRef.current.contains(e.target)) {
+        setTimeout(() => {
+          setOpenProfileMenu(false);
+        }, 100);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   return (
     <nav className="flex items-center justify-between px-6 md:px-16 lg:px-24 xl:px-32 py-4 border-b border-gray-300 bg-white transition-all z-40">
       <Link to={"/"} onClick={() => setOpen(false)}>
@@ -73,6 +87,15 @@ const Navbar = () => {
 
       {/* Desktop Menu */}
       <div className="hidden sm:flex items-center gap-7">
+        <NavLink
+          to={"/seller"}
+          className={
+            "hover:text-primary-dull transition-colors border border-gray-300 px-3 py-1 rounded-full text-xs cursor-pointer opacity-80"
+          }
+        >
+          Seller Dashboard
+        </NavLink>
+
         <NavLink
           to={"/"}
           className={"hover:text-primary-dull transition-colors"}
@@ -85,12 +108,6 @@ const Navbar = () => {
           end={true}
         >
           All Products
-        </NavLink>
-        <NavLink
-          to={"/contact"}
-          className={"hover:text-primary-dull transition-colors"}
-        >
-          Contact
         </NavLink>
 
         {location.pathname === "/products" ? (
@@ -140,6 +157,7 @@ const Navbar = () => {
           <div
             className="relative"
             onClick={() => setOpenProfileMenu(!openProfileMenu)}
+            ref={menuRef}
           >
             <img
               src={user.pic || assets.profile_icon}
@@ -164,7 +182,12 @@ const Navbar = () => {
               </li>
               <span className="w-full h-0.5 bg-primary mt-0.5 mb-1.5" />
               <li className="py-1.5 rounded-lg hover:bg-primary/10 transition-colors w-full text-center cursor-pointer">
-                <NavLink to="/my-orders">My Orders</NavLink>
+                <NavLink
+                  to="/my-orders"
+                  onClick={() => setOpenProfileMenu(false)}
+                >
+                  My Orders
+                </NavLink>
               </li>
               <li
                 className="py-1.5 rounded-lg hover:bg-primary/10 transition-colors w-full text-center cursor-pointer"
@@ -206,13 +229,13 @@ const Navbar = () => {
       <div
         className={`${
           open ? "opacity-100 scale-100" : "opacity-0 scale-0"
-        } origin-top transition duration-200 h-screen absolute top-[70px] left-0 w-full bg-white shadow-md py-4 flex flex-col items-center gap-2 px-5 text-sm sm:hidden`}
+        } origin-top transition duration-200 h-screen absolute top-[70px] left-0 w-full bg-white shadow-md py-4 flex flex-col items-center gap-2 px-5 text-sm sm:hidden z-9999`}
       >
         <NavLink
           to={"/"}
           onClick={() => setOpen(false)}
           className={
-            "w-full text-center mb-2 font-semibold bg-primary/10 py-2 rounded-full text-primary active:bg-primary active:text-white transition duration-200"
+            "w-full text-center mb-2 font-semibold bg-primary/10 py-2 rounded-full text-primary active:scale-95 active:bg-primary active:text-white! transition duration-200"
           }
         >
           Home
@@ -221,7 +244,7 @@ const Navbar = () => {
           to={"/products"}
           onClick={() => setOpen(false)}
           className={
-            "w-full text-center mb-2 font-semibold bg-primary/10 py-2 rounded-full text-primary active:bg-primary active:text-white transition duration-200"
+            "w-full text-center mb-2 font-semibold bg-primary/10 py-2 rounded-full text-primary active:scale-95 active:bg-primary active:text-white! transition duration-200"
           }
         >
           All Products
@@ -231,25 +254,16 @@ const Navbar = () => {
             to={"/my-orders"}
             onClick={() => setOpen(false)}
             className={
-              "w-full text-center mb-2 font-semibold bg-primary/10 py-2 rounded-full text-primary active:bg-primary active:text-white transition duration-200"
+              "w-full text-center mb-2 font-semibold bg-primary/10 py-2 rounded-full text-primary active:scale-95 active:bg-primary active:text-white! transition duration-200"
             }
           >
             My Orders
           </NavLink>
         )}
-        <NavLink
-          to={"/contact"}
-          onClick={() => setOpen(false)}
-          className={
-            "w-full text-center mb-2 font-semibold bg-primary/10 py-2 rounded-full text-primary active:bg-primary-dull active:text-white transition duration-200"
-          }
-        >
-          Contact
-        </NavLink>
 
         {!user ? (
           <button
-            className="w-full cursor-pointer px-6 py-2 mt-6 bg-primary hover:bg-primary-dull transition text-white rounded-full text-lg font-semibold"
+            className="w-full cursor-pointer px-6 py-2 bg-primary hover:bg-primary-dull transition text-white rounded-full text-lg font-semibold"
             onClick={() => {
               setOpen(false);
               setShowUserLogin(true);
@@ -265,6 +279,16 @@ const Navbar = () => {
             Logout
           </button>
         )}
+
+        <NavLink
+          to={"/seller"}
+          onClick={() => setOpen(false)}
+          className={
+            "w-full text-center mb-2 font-semibold bg-gray-100 py-2 mt-4 rounded-full text-black active:scale-95 active:bg-primary active:text-white! transition duration-200"
+          }
+        >
+          Seller Dashboard
+        </NavLink>
       </div>
     </nav>
   );
