@@ -2,6 +2,7 @@ import { useState } from "react";
 import { assets, categories } from "../../assets/assets";
 import toast from "react-hot-toast";
 import { useAppContext } from "../../context/AppContext";
+import { Loader } from "lucide-react";
 
 const AddProduct = () => {
   const [files, setFiles] = useState([]);
@@ -10,12 +11,14 @@ const AddProduct = () => {
   const [category, setCategory] = useState("");
   const [price, setPrice] = useState("");
   const [offerPrice, setOfferPrice] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const { axios } = useAppContext();
 
   const onSubmitHandler = async (e) => {
     try {
       e.preventDefault();
+      setLoading(true);
 
       const productData = {
         name,
@@ -40,14 +43,14 @@ const AddProduct = () => {
         setPrice("");
         setOfferPrice("");
         setFiles([]);
-
-        console.log("Form Data ==========", formData);
       } else {
         toast.error(data.message);
       }
     } catch (error) {
       console.error(error);
       toast.error(error.response.data.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -172,9 +175,10 @@ const AddProduct = () => {
         </div>
         <button
           type="submit"
-          className="px-8 py-2.5 bg-primary text-white font-medium rounded cursor-pointer"
+          className="px-8 py-2.5 bg-primary text-white font-medium rounded cursor-pointer w-full disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center"
+          disabled={loading}
         >
-          ADD
+          {loading ? <Loader className="animate-spin size-5" /> : "ADD PRODUCT"}
         </button>
       </form>
     </div>

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useAppContext } from "../context/AppContext";
 import { assets } from "../assets/assets";
 import toast from "react-hot-toast";
+import { Loader } from "lucide-react";
 
 const Cart = () => {
   const {
@@ -24,6 +25,7 @@ const Cart = () => {
   const [showAddress, setShowAddress] = useState(false);
   const [selectedAddress, setSelectedAddress] = useState(null);
   const [paymentOption, setPaymentOption] = useState("COD");
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const getCart = () => {
@@ -67,6 +69,7 @@ const Cart = () => {
 
   const placeOrder = async () => {
     try {
+      setLoading(true);
       if (cartArray.length < 1) {
         toast.error("Cart is Empty");
         return;
@@ -114,6 +117,8 @@ const Cart = () => {
     } catch (error) {
       console.log(error);
       toast.error(error.response.data.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -315,10 +320,17 @@ const Cart = () => {
         </div>
 
         <button
-          className="w-full py-3 mt-6 cursor-pointer bg-primary text-white font-medium hover:bg-primary-dull transition"
+          className="w-full py-3 mt-6 cursor-pointer bg-primary text-white font-medium hover:bg-primary-dull transition disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center"
           onClick={placeOrder}
+          disabled={loading}
         >
-          {paymentOption === "COD" ? "Place Order" : "Process to Checkout"}
+          {loading ? (
+            <Loader className="animate-spin size-5" />
+          ) : paymentOption === "COD" ? (
+            "Place Order"
+          ) : (
+            "Process to Checkout"
+          )}
         </button>
       </div>
     </div>

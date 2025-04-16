@@ -1,17 +1,20 @@
 import { useEffect, useRef, useState } from "react";
 import { useAppContext } from "../../context/AppContext";
 import toast from "react-hot-toast";
+import { Loader } from "lucide-react";
 
 const SellerLogin = () => {
   const { isSeller, setIsSeller, navigate, axios } = useAppContext();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
   const inpRef = useRef(null);
 
   const onSubmitHandler = async (e) => {
     try {
       e.preventDefault();
+      setLoading(true);
       const { data } = await axios.post("/api/seller/login", {
         email,
         password,
@@ -26,6 +29,8 @@ const SellerLogin = () => {
     } catch (error) {
       console.log(error);
       toast.error(error.response.data.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -77,9 +82,10 @@ const SellerLogin = () => {
 
           <button
             type="submit"
-            className="bg-primary text-white w-full p-2 rounded-md cursor-pointer"
+            className="bg-primary text-white w-full p-2 rounded-md cursor-pointer disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center"
+            disabled={loading}
           >
-            Login
+            {loading ? <Loader className="animate-spin size-5" /> : "Login"}
           </button>
         </div>
       </form>

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useAppContext } from "../../context/AppContext";
 import toast from "react-hot-toast";
+import { Loader } from "lucide-react";
 
 const Login = () => {
   const { showUserLogin, setShowUserLogin, setUser, axios, navigate } =
@@ -10,6 +11,7 @@ const Login = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const inpRef = useRef(null);
 
@@ -37,6 +39,7 @@ const Login = () => {
   const onSubmitHandler = async (e) => {
     try {
       e.preventDefault();
+      setLoading(true);
 
       const { data } = await axios.post(`/api/user/${state}`, {
         name,
@@ -50,6 +53,7 @@ const Login = () => {
         setUser(data.user);
         setShowUserLogin(false);
         data.message && toast.success(data.message);
+        setState("login");
         setName("");
         setEmail("");
         setPassword("");
@@ -59,6 +63,8 @@ const Login = () => {
     } catch (error) {
       console.error(error);
       toast.error(error.response.data.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -141,8 +147,18 @@ const Login = () => {
             </span>
           </p>
         )}
-        <button className="bg-primary hover:bg-primary-dull transition-all text-white w-full py-2 rounded-md cursor-pointer">
-          {state === "register" ? "Create Account" : "Login"}
+        <button
+          type="submit"
+          className={`bg-primary hover:bg-primary-dull transition-all text-white w-full py-2 rounded-md cursor-pointer disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center`}
+          disabled={loading}
+        >
+          {loading ? (
+            <Loader className="animate-spin size-5" />
+          ) : state === "register" ? (
+            "Create Account"
+          ) : (
+            "Login"
+          )}
         </button>
       </form>
     </div>

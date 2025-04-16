@@ -3,10 +3,12 @@ import { Link, NavLink, useLocation } from "react-router-dom";
 import { assets } from "../assets/assets";
 import { useAppContext } from "../context/AppContext";
 import toast from "react-hot-toast";
+import { Loader } from "lucide-react";
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
   const [openProfileMenu, setOpenProfileMenu] = useState(false);
+  const [loading, setLoading] = useState(false);
   const menuRef = useRef(null);
 
   const location = useLocation();
@@ -23,6 +25,7 @@ const Navbar = () => {
 
   const logout = async () => {
     try {
+      setLoading(true);
       const { data } = await axios.post("/api/user/logout");
 
       if (data.success) {
@@ -35,6 +38,8 @@ const Navbar = () => {
     } catch (error) {
       console.error(error);
       toast.error(error.response.data.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -189,12 +194,17 @@ const Navbar = () => {
                   My Orders
                 </NavLink>
               </li>
-              <li
-                className="py-1.5 rounded-lg hover:bg-primary/10 transition-colors w-full text-center cursor-pointer"
+              <button
+                className="py-1.5 rounded-lg hover:bg-primary/10 transition-colors w-full text-center cursor-pointer disabled:bg-inherit disabled:cursor-not-allowed flex items-center justify-center"
                 onClick={logout}
+                disabled={loading}
               >
-                Logout
-              </li>
+                {loading ? (
+                  <Loader className="animate-spin size-5" />
+                ) : (
+                  "Logout"
+                )}
+              </button>
             </ul>
           </div>
         )}

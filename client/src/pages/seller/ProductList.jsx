@@ -1,11 +1,15 @@
 import toast from "react-hot-toast";
 import { useAppContext } from "../../context/AppContext";
+import { Loader } from "lucide-react";
+import { useState } from "react";
 
 const ProductList = () => {
   const { products, currency, fetchProducts, axios } = useAppContext();
+  const [loadingId, setLoadingId] = useState(null);
 
   const toggleStock = async (id, inStock) => {
     try {
+      setLoadingId(id);
       const { data } = await axios.post("/api/product/stock", { id, inStock });
 
       if (data.success) {
@@ -17,6 +21,8 @@ const ProductList = () => {
     } catch (error) {
       console.log(error);
       toast.error(error.response.data.message);
+    } finally {
+      setLoadingId(false);
     }
   };
 
@@ -71,9 +77,25 @@ const ProductList = () => {
                           toggleStock(product._id, !product.inStock)
                         }
                         checked={product.inStock}
+                        disabled={loadingId === product._id}
                       />
-                      <div className="w-8 sm:w-10 h-5 sm:h-6 bg-slate-300 rounded-full peer peer-checked:bg-primary transition-colors duration-200" />
-                      <span className="dot absolute left-1 top-1 w-3 sm:w-4 h-3 sm:h-4 bg-white rounded-full transition-transform duration-200 ease-in-out peer-checked:translate-x-3 sm:peer-checked:translate-x-4" />
+                      <div
+                        className={`w-8 sm:w-10 h-5 sm:h-6 rounded-full transition-colors duration-200 ${
+                          product.inStock ? "bg-primary" : "bg-slate-300"
+                        } ${
+                          loadingId === product._id &&
+                          "opacity-50 cursor-not-allowed"
+                        }`}
+                      />
+                      {loadingId === product._id ? (
+                        <Loader
+                          className={`animate-spin size-5 text-primary-dull dot absolute left-1 top-1 w-3 sm:w-4 h-3 sm:h-4 bg-white rounded-full transition-transform duration-200 ease-in-out peer-checked:translate-x-3 sm:peer-checked:translate-x-4 ${
+                            product.inStock && "cursor-not-allowed"
+                          }`}
+                        />
+                      ) : (
+                        <span className="dot absolute left-1 top-1 w-3 sm:w-4 h-3 sm:h-4 bg-white rounded-full transition-transform duration-200 ease-in-out peer-checked:translate-x-3 sm:peer-checked:translate-x-4" />
+                      )}
                     </label>
                   </td>
                 </tr>
