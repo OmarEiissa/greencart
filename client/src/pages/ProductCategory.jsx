@@ -3,9 +3,10 @@ import { useAppContext } from "../context/AppContext";
 import { categories } from "../assets/assets";
 import TitleForPage from "../components/shared-component/TitleForPage";
 import ProductCard from "../components/shared-component/ProductCard";
+import ProductSkeleton from "../components/shared-component/ProductSkeleton";
 
 const ProductCategory = () => {
-  const { products } = useAppContext();
+  const { products, initialLoading } = useAppContext();
   const { category } = useParams();
 
   const searchCategory = categories.find(
@@ -21,23 +22,31 @@ const ProductCategory = () => {
       {searchCategory && <TitleForPage title={searchCategory.text} />}
 
       {searchCategory ? (
-        filteredProducts.length > 0 ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-6 mt-6">
-            {filteredProducts.map((product, index) => (
-              <ProductCard key={index} product={product} />
-            ))}
-          </div>
-        ) : (
-          <div className="flex items-center justify-center h-[62vh]">
-            <p className="text-2xl font-medium text-primary">
-              No products found in this category.
+        <div
+          className={`grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-6 mt-6 ${
+            !initialLoading && products.length === 0
+              ? "min-h-70 !flex items-center justify-center"
+              : ""
+          }`}
+        >
+          {initialLoading ? (
+            Array.from({ length: 5 }).map((_, index) => (
+              <ProductSkeleton key={index} />
+            ))
+          ) : !initialLoading && products.length === 0 ? (
+            <p className="text-2xl font-medium text-gray-400">
+              No products found
             </p>
-          </div>
-        )
+          ) : (
+            filteredProducts.map((product, index) => (
+              <ProductCard key={index} product={product} />
+            ))
+          )}
+        </div>
       ) : (
         <div className="flex items-center justify-center h-[67vh]">
-          <p className="text-2xl font-medium text-primary">
-            Category not found.
+          <p className="text-2xl font-medium text-gray-400">
+            Category not found
           </p>
         </div>
       )}
@@ -46,3 +55,16 @@ const ProductCategory = () => {
 };
 
 export default ProductCategory;
+// filteredProducts.length > 0 ? (
+//           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-6 mt-6">
+//             {filteredProducts.map((product, index) => (
+//               <ProductCard key={index} product={product} />
+//             ))}
+//           </div>
+//         ) : (
+//           <div className="flex items-center justify-center h-[62vh]">
+//             <p className="text-2xl font-medium text-primary">
+//               No products found in this category.
+//             </p>
+//           </div>
+//         )

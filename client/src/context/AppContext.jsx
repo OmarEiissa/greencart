@@ -21,6 +21,8 @@ export const AppContextProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState({});
   const [searchQuery, setSearchQuery] = useState("");
 
+  const [initialLoading, setInitialLoading] = useState(true);
+
   // Fetch Seller Status
   const fetchSeller = async () => {
     try {
@@ -65,6 +67,8 @@ export const AppContextProvider = ({ children }) => {
     } catch (error) {
       console.log(error);
       toast.error(error.response.data.message);
+    } finally {
+      setInitialLoading(false);
     }
   };
 
@@ -191,6 +195,8 @@ export const AppContextProvider = ({ children }) => {
     getCartAmount,
 
     axios,
+
+    initialLoading,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

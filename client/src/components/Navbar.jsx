@@ -273,7 +273,7 @@ const Navbar = () => {
 
         {!user ? (
           <button
-            className="w-full cursor-pointer px-6 py-2 bg-primary hover:bg-primary-dull transition text-white rounded-full text-lg font-semibold"
+            className="w-full cursor-pointer px-6 py-2 mt-6 bg-primary hover:bg-primary-dull transition text-white rounded-full text-lg font-semibold"
             onClick={() => {
               setOpen(false);
               setShowUserLogin(true);

@@ -1,7 +1,9 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { assets } from "../assets/assets";
 import toast from "react-hot-toast";
 import { useAppContext } from "../context/AppContext";
+import { Loader } from "lucide-react";
+import UserNotLoggedIn from "../components/shared-component/UserNotLoggedIn";
 
 // Input Field Component
 const InputField = ({ type, placeholder, name, handleChange, address }) => (
@@ -17,7 +19,8 @@ const InputField = ({ type, placeholder, name, handleChange, address }) => (
 );
 
 const AddAddress = () => {
-  const { axios, user, navigate } = useAppContext();
+  const { axios, navigate, user } = useAppContext();
+  const [loading, setLoading] = useState(false);
 
   const [address, setAddress] = useState({
     firstName: "",
@@ -43,6 +46,7 @@ const AddAddress = () => {
   const onSubmitHandler = async (e) => {
     e.preventDefault();
     try {
+      setLoading(true);
       const { data } = await axios.post("/api/address/add", { address });
 
       if (data.success) {
@@ -55,14 +59,14 @@ const AddAddress = () => {
     } catch (error) {
       console.error(error);
       toast.error(error.response.data.message);
+    } finally {
+      setLoading(false);
     }
   };
 
-  useEffect(() => {
-    if (!user) {
-      navigate("/cart");
-    }
-  }, [user, navigate]);
+  if (!user) {
+    return <UserNotLoggedIn />;
+  }
 
   return (
     <div className="mt-16 pb-16">
@@ -150,9 +154,14 @@ const AddAddress = () => {
 
             <button
               type="submit"
-              className="w-full mt-6 bg-primary text-white py-3 hover:bg-primary-dull transition cursor-pointer uppercase"
+              className={`w-full mt-6 bg-primary text-white py-3 hover:bg-primary-dull transition cursor-pointer uppercase disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center`}
+              disabled={loading}
             >
-              Save Address
+              {loading ? (
+                <Loader className="animate-spin size-5" />
+              ) : (
+                "Save Address"
+              )}
             </button>
           </form>
         </div>

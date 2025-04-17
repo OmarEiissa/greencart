@@ -2,14 +2,17 @@ import { useEffect, useState } from "react";
 import { useAppContext } from "../../context/AppContext";
 import { assets } from "../../assets/assets";
 import toast from "react-hot-toast";
+import OrdersListSkeleton from "../../components/seller/OrdersListSkeleton";
 
 const Orders = () => {
   const { currency, axios } = useAppContext();
   const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchOrders = async () => {
       try {
+        setLoading(true);
         const { data } = await axios.get("/api/order/seller");
 
         if (data.success) {
@@ -21,12 +24,16 @@ const Orders = () => {
       } catch (error) {
         console.log(error);
         toast.error(error.response.data.message);
+      } finally {
+        setLoading(false);
       }
     };
     fetchOrders();
   }, []);
 
-  return (
+  return loading ? (
+    <OrdersListSkeleton />
+  ) : (
     <div className="no-scrollbar flex-1   overflow-y-scroll">
       <div className="md:p-10 p-4 space-y-4">
         <h2 className="text-lg font-medium">Orders List</h2>

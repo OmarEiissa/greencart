@@ -2,9 +2,11 @@ import toast from "react-hot-toast";
 import { useAppContext } from "../../context/AppContext";
 import { Loader } from "lucide-react";
 import { useState } from "react";
+import ProductsTableSkeleton from "../../components/seller/ProductsTableSkeleton";
 
 const ProductList = () => {
-  const { products, currency, fetchProducts, axios } = useAppContext();
+  const { products, currency, fetchProducts, axios, initialLoading } =
+    useAppContext();
   const [loadingId, setLoadingId] = useState(null);
 
   const toggleStock = async (id, inStock) => {
@@ -26,7 +28,9 @@ const ProductList = () => {
     }
   };
 
-  return (
+  return initialLoading ? (
+    <ProductsTableSkeleton />
+  ) : (
     <div className="no-scrollbar flex-1   overflow-y-scroll flex flex-col justify-between">
       <div className="w-full md:p-10 p-4">
         <h2 className="pb-4 text-lg font-medium">All Products</h2>
